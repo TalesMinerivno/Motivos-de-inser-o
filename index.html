@@ -1,230 +1,598 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Light - Motivos de Impedimento</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Light - Palavras-chave da Operação</title>
+  <style>
+    :root {
+      --primary: #009b91;
+      --primary-dark: #007c74;
+      --secondary: #f58c0a;
+      --background: #f5f7f9;
+      --card: #ffffff;
+      --text: #333333;
+      --muted: #666666;
+      --danger: #c62828;
+    }
 
-<style>
-:root{
-    --primary:#009B91;
-    --secondary:#F58C0A;
-    --bg:#f5f7f9;
-    --card:#ffffff;
-    --text:#333333;
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Segoe UI',sans-serif;
-}
+    body {
+      min-height: 100vh;
+      background: var(--background);
+      color: var(--text);
+    }
 
-body{
-    background:var(--bg);
-    color:var(--text);
-}
+    button, input { font: inherit; }
 
-.header{
-    background:white;
-    padding:20px;
-    text-align:center;
-    box-shadow:0 2px 10px rgba(0,0,0,0.08);
-}
+    .header {
+      background: #fff;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
 
-.logo{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:12px;
-}
+    .logo h1 {
+      color: var(--primary);
+      font-size: 36px;
+    }
 
-.logo img{
-    width:70px;
-}
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+    }
 
-.logo h1{
-    color:var(--primary);
-    font-size:36px;
-}
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 25px;
+    }
 
-.subtitle{
-    margin-top:8px;
-    color:#666;
-}
+    .screen { display: none; }
+    .screen.active { display: block; }
 
-.container{
-    max-width:1200px;
-    margin:auto;
-    padding:25px;
-}
+    .section-heading {
+      margin-bottom: 25px;
+      text-align: center;
+    }
 
-.search{
-    width:100%;
-    padding:14px 18px;
-    border:2px solid var(--primary);
-    border-radius:12px;
-    outline:none;
-    font-size:16px;
-    margin-bottom:25px;
-}
+    .section-heading h2 { font-size: 26px; }
+    .section-heading p { margin-top: 7px; color: var(--muted); }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:15px;
-}
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 850px;
+      margin: 0 auto;
+    }
 
-.card{
-    background:var(--card);
-    border-left:5px solid var(--primary);
-    border-radius:12px;
-    padding:18px;
-    cursor:pointer;
-    transition:.2s;
-    box-shadow:0 2px 8px rgba(0,0,0,0.05);
-}
+    .category-card {
+      width: 100%;
+      min-height: 230px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      text-align: left;
+      background: var(--card);
+      color: var(--text);
+      border: 0;
+      border-left: 6px solid var(--primary);
+      border-radius: 16px;
+      padding: 25px;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(0,0,0,.08);
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+    }
 
-.card:hover{
-    transform:translateY(-3px);
-    border-left-color:var(--secondary);
-    box-shadow:0 5px 15px rgba(0,0,0,0.1);
-}
+    .category-card:hover {
+      transform: translateY(-5px);
+      border-left-color: var(--secondary);
+      box-shadow: 0 8px 22px rgba(0,0,0,.13);
+    }
 
-.card-title{
-    font-weight:600;
-    font-size:14px;
-}
+    .category-card:focus-visible,
+    .card:focus-visible,
+    .back-button:focus-visible {
+      outline: 3px solid rgba(245,140,10,.55);
+      outline-offset: 3px;
+    }
 
-.toast{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background:var(--primary);
-    color:white;
-    padding:14px 20px;
-    border-radius:8px;
-    font-weight:bold;
-    display:none;
-}
-</style>
+    .category-icon {
+      width: 70px;
+      height: 70px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: rgba(0,155,145,.1);
+      color: var(--primary);
+      font-size: 38px;
+    }
+
+    .category-title {
+      display: block;
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .category-description {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .category-footer {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 22px;
+    }
+
+    .category-count {
+      padding: 6px 11px;
+      background: var(--background);
+      border-radius: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .category-arrow {
+      color: var(--primary);
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .back-button {
+      min-height: 44px;
+      padding: 10px 16px;
+      background: #fff;
+      color: var(--primary-dark);
+      border: 2px solid var(--primary);
+      border-radius: 11px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .back-button:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .selected-category {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .selected-category-icon {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 27px;
+    }
+
+    .selected-category-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .selected-category-title {
+      margin-top: 2px;
+      color: var(--primary);
+      font-size: 22px;
+    }
+
+    .search-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .search {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      outline: none;
+      font-size: 16px;
+      margin-bottom: 12px;
+      background: #fff;
+    }
+
+    .search:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 4px rgba(245,140,10,.15);
+    }
+
+    .results-info {
+      min-height: 24px;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      width: 100%;
+      min-height: 85px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      text-align: left;
+      background: var(--card);
+      color: var(--text);
+      border: 0;
+      border-left: 5px solid var(--primary);
+      border-radius: 12px;
+      padding: 18px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.4;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-left-color: var(--secondary);
+      box-shadow: 0 5px 15px rgba(0,0,0,.1);
+    }
+
+    .copy-icon {
+      width: 35px;
+      height: 35px;
+      flex: 0 0 35px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: rgba(0,155,145,.1);
+      color: var(--primary);
+      font-size: 18px;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 40px 20px;
+      background: #fff;
+      color: var(--muted);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      max-width: calc(100% - 40px);
+      padding: 14px 20px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(15px);
+      transition: opacity .2s, transform .2s, visibility .2s;
+      box-shadow: 0 5px 18px rgba(0,0,0,.18);
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .toast.error { background: var(--danger); }
+
+    @media (max-width: 700px) {
+      .container { padding: 20px 15px; }
+      .category-grid, .grid { grid-template-columns: 1fr; }
+      .category-header { align-items: flex-start; flex-direction: column; }
+      .selected-category { order: -1; }
+      .back-button { width: 100%; }
+    }
+  </style>
 </head>
-
 <body>
+  <header class="header">
+    <div class="logo"><h1>Light</h1></div>
+    <p class="subtitle" id="subtitle">Selecione o tipo de serviço para visualizar as justificativas</p>
+  </header>
 
-<div class="header">
-    <div class="logo">
-        <!-- Substitua pelo arquivo do logo -->
-        <logo-light.png="Logo Light">
-        <h1>Light</h1>
-    </div>
-    <p class="subtitle">
-        Clique em qualquer motivo para copiar automaticamente
-    </p>
-</div>
+  <main class="container">
+    <section id="category-screen" class="screen active">
+      <div class="section-heading">
+        <h2>Escolha uma categoria</h2>
+        <p>Você poderá voltar e trocar de categoria quando precisar.</p>
+      </div>
 
-<div class="container">
+      <div class="category-grid">
+        <button type="button" class="category-card" data-category="tempoReal">
+          <span class="category-icon" aria-hidden="true">◷</span>
+          <span>
+            <span class="category-title">Tempo real</span>
+            <span class="category-description">Justificativas para ocorrências e serviços em andamento.</span>
+          </span>
+          <span class="category-footer">
+            <span class="category-count" id="tempoReal-count"></span>
+            <span class="category-arrow">→</span>
+          </span>
+        </button>
 
-    <input
-        type="text"
-        id="search"
-        class="search"
-        placeholder="Pesquisar motivo..."
-    >
+        <button type="button" class="category-card" data-category="programada">
+          <span class="category-icon" aria-hidden="true">▣</span>
+          <span>
+            <span class="category-title">Programada</span>
+            <span class="category-description">Justificativas relacionadas aos serviços previamente programados.</span>
+          </span>
+          <span class="category-footer">
+            <span class="category-count" id="programada-count"></span>
+            <span class="category-arrow">→</span>
+          </span>
+        </button>
+      </div>
+    </section>
 
-    <div class="grid" id="grid"></div>
+    <section id="reasons-screen" class="screen">
+      <div class="category-header">
+        <button type="button" id="back-button" class="back-button">← Voltar às categorias</button>
+        <div class="selected-category">
+          <div id="selected-category-icon" class="selected-category-icon"></div>
+          <div>
+            <p class="selected-category-label">Categoria selecionada</p>
+            <h2 id="selected-category-title" class="selected-category-title"></h2>
+          </div>
+        </div>
+      </div>
 
-</div>
+      <label class="search-label" for="search">Pesquisar justificativa</label>
+      <input type="search" id="search" class="search" placeholder="Digite parte da justificativa..." autocomplete="off">
+      <p id="results-info" class="results-info" aria-live="polite"></p>
+      <div class="grid" id="grid"></div>
+    </section>
+  </main>
 
-<div class="toast" id="toast">
-    Texto copiado com sucesso!
-</div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script>
+  <script>
+    const categorias = {
+      tempoReal: {
+        titulo: "Tempo real",
+        icone: "◷",
+        motivos: ["#FALHA",
+"#TR",
+"#CF",
+"#SL",
+"#RD",
+"#TRECHO",
+          "ATRASO NA LIBERAÇÃO",
+          "ATRASO NA PREPARAÇÃO",
+          "CONDIÇÕES ATMOSFÉRICAS",
+          "CONSUMIDOR",
+          "DEFEITO EM EQUIPAMENTO",
+"DEFEITO INTERNO",
+          "DEMORA DO OPERADOR",
+          "DIFICULDADE DE LOCALIZAÇÃO",
+          "FALTA DE MANTENEDOR",
+          "FALTA DE MÃO DE OBRA",
+          "FALTA DE MATERIAL",
+          "FALTA DE TURMA",
+"LIBERADO PARA REGRA DE OURO",
+          "LOCAL PERIGOSO",
+          "LOCAL SEM ACESSO / DIFÍCIL ACESSO",
+          "NET EM CONTINGÊNCIA",
+          "PRIORIDADE OUTROS SERVIÇOS EMERGENCIAIS",
+          "RECURSO DESARMADO, REDE MANOBRADA OU ANORMALIDADES",
+          "SEM CONTATO COM A TURMA",
+          "TRÂNSITO",
+"TURMA SEM TRIPÉ",
+"TURMA EM REFEIÇÃO",
+          "VIATURA QUEBRADA"
+        ]
+      },
+      programada: {
+        titulo: "Programada",
+        icone: "▣",
+        motivos: [
+          "ABERTURA DE ECD'S",
+          "CLIENTES NÃO AVISADOS",
+          "DEMORA NA SOLICITAÇÃO DE TURMA/OPERADOR",
+          "DEMORA NA SOLICITAÇÃO PELA REGIONAL",
+          "DIVERGÊNCIA ENTRE GDIS × CAMPO",
+          "ERRO GDIS",
+          "FALHA DE PLANEJAMENTO DA PROGRAMAÇÃO",
+          "FALHA NA PROGRAMAÇÃO",
+          "FALTA DE TEMPO HÁBIL",
+          "PRIORIDADE OUTROS SERVIÇOS PROGRAMADOS",
+          "LIBERADO PARA REGRA DE OURO",
+          "TRECHO INCORRETO"
+        ]
+      }
+    };
 
-const motivos = [
+    const categoryScreen = document.getElementById("category-screen");
+    const reasonsScreen = document.getElementById("reasons-screen");
+    const categoryButtons = document.querySelectorAll(".category-card");
+    const backButton = document.getElementById("back-button");
+    const selectedCategoryTitle = document.getElementById("selected-category-title");
+    const selectedCategoryIcon = document.getElementById("selected-category-icon");
+    const subtitle = document.getElementById("subtitle");
+    const grid = document.getElementById("grid");
+    const search = document.getElementById("search");
+    const toast = document.getElementById("toast");
+    const resultsInfo = document.getElementById("results-info");
 
-"ABERTURA DE ECD'S",
-"ATRASO NA LIBERAÇÃO",
-"ATRASO NA PREPARAÇÃO",
-"CLIENTES NÃO AVISADOS",
-"CONDIÇÕES ATMOSFÉRICAS",
-"CONSUMIDOR",
-"DEFEITO EM EQUIPAMENTO",
-"DEMORA DO OPERADOR",
-"DEMORA NA SOLICITAÇÃO DE TURMA/OPERADOR",
-"DEMORA NA SOLICITAÇÃO PELA REGIONAL",
-"DIFICULDADE DE LOCALIZAÇÃO",
-"DIVERGÊNCIA ENTRE GDIS × CAMPO",
-"ERRO GDIS",
-"FALHA DE PLANEJAMENTO DA PROGRAMAÇÃO",
-"FALHA NA PROGRAMAÇÃO",
-"FALTA DE MANTENEDOR",
-"FALTA DE MÃO DE OBRA",
-"FALTA DE MATERIAL",
-"FALTA DE TEMPO HÁBIL",
-"FALTA DE TURMA",
-"LOCAL PERIGOSO",
-"LOCAL SEM ACESSO / DIFÍCIL ACESSO",
-"NET EM CONTINGÊNCIA",
-"PRIORIDADE OUTROS SERVIÇOS EMERGENCIAIS",
-"PRIORIDADE OUTROS SERVIÇOS PROGRAMADOS",
-"PREPARAÇÃO DE REGRA DE OURO",
-"RECURSO DESARMADO, REDE MANOBRADA OU ANORMALIDADES",
-"SEM CONTATO COM A TURMA",
-"TRÂNSITO",
-"TRECHO INCORRETO",
-"VIATURA QUEBRADA"
+    let categoriaAtual = null;
+    let toastTimeout = null;
 
-];
+    function normalizarTexto(texto) {
+      return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+    }
 
-const grid = document.getElementById('grid');
+    function atualizarContadoresCategorias() {
+      Object.keys(categorias).forEach(function(id) {
+        const quantidade = categorias[id].motivos.length;
+        document.getElementById(id + "-count").textContent =
+          quantidade + (quantidade === 1 ? " justificativa" : " justificativas");
+      });
+    }
 
-function render(lista){
+    function mostrarToast(mensagem, erro) {
+      clearTimeout(toastTimeout);
+      toast.textContent = mensagem;
+      toast.classList.toggle("error", Boolean(erro));
+      toast.classList.add("show");
+      toastTimeout = setTimeout(function() { toast.classList.remove("show"); }, 1800);
+    }
 
-    grid.innerHTML = '';
+    function copiaAlternativa(texto) {
+      const area = document.createElement("textarea");
+      area.value = texto;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.focus();
+      area.select();
+      const ok = document.execCommand("copy");
+      area.remove();
+      return ok;
+    }
 
-    lista.forEach(item => {
+    async function copiarTexto(texto) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(texto);
+        } else if (!copiaAlternativa(texto)) {
+          throw new Error("Cópia não permitida");
+        }
+        mostrarToast("Texto copiado com sucesso!", false);
+      } catch (erro) {
+        console.error(erro);
+        mostrarToast("Não foi possível copiar o texto.", true);
+      }
+    }
 
-        const card = document.createElement('div');
-        card.className = 'card';
+    function atualizarContador(quantidade) {
+      resultsInfo.textContent = quantidade === 0
+        ? "Nenhuma justificativa encontrada."
+        : quantidade === 1
+          ? "1 justificativa encontrada."
+          : quantidade + " justificativas encontradas.";
+    }
 
-        card.innerHTML =
-        `<div class="card-title">${item}</div>`;
+    function render(lista) {
+      grid.innerHTML = "";
+      atualizarContador(lista.length);
 
-        card.onclick = () => {
+      if (lista.length === 0) {
+        const vazio = document.createElement("div");
+        vazio.className = "empty-state";
+        vazio.textContent = "Nenhuma justificativa corresponde à pesquisa.";
+        grid.appendChild(vazio);
+        return;
+      }
 
-            navigator.clipboard.writeText(item);
+      lista.forEach(function(item) {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "card";
 
-            const toast = document.getElementById('toast');
+        const texto = document.createElement("span");
+        texto.textContent = item;
 
-            toast.style.display = 'block';
+        const icone = document.createElement("span");
+        icone.className = "copy-icon";
+        icone.textContent = "⧉";
+        icone.setAttribute("aria-hidden", "true");
 
-            setTimeout(() => {
-                toast.style.display = 'none';
-            },1800);
-        };
-
+        card.appendChild(texto);
+        card.appendChild(icone);
+        card.addEventListener("click", function() { copiarTexto(item); });
         grid.appendChild(card);
+      });
+    }
+
+    function abrirCategoria(id) {
+      const categoria = categorias[id];
+      if (!categoria) return;
+
+      categoriaAtual = id;
+      selectedCategoryTitle.textContent = categoria.titulo;
+      selectedCategoryIcon.textContent = categoria.icone;
+      subtitle.textContent = "Clique em uma justificativa para copiar automaticamente";
+      search.value = "";
+      categoryScreen.classList.remove("active");
+      reasonsScreen.classList.add("active");
+      render(categoria.motivos);
+    }
+
+    function voltarParaCategorias() {
+      categoriaAtual = null;
+      search.value = "";
+      grid.innerHTML = "";
+      resultsInfo.textContent = "";
+      reasonsScreen.classList.remove("active");
+      categoryScreen.classList.add("active");
+      subtitle.textContent = "Selecione o tipo de serviço para visualizar as justificativas";
+    }
+
+    categoryButtons.forEach(function(button) {
+      button.addEventListener("click", function() {
+        abrirCategoria(button.dataset.category);
+      });
     });
-}
 
-render(motivos);
+    backButton.addEventListener("click", voltarParaCategorias);
 
-document.getElementById('search')
-.addEventListener('input', function(){
+    search.addEventListener("input", function() {
+      if (!categoriaAtual) return;
+      const termo = normalizarTexto(search.value);
+      const lista = categorias[categoriaAtual].motivos.filter(function(item) {
+        return normalizarTexto(item).includes(termo);
+      });
+      render(lista);
+    });
 
-    const termo = this.value.toUpperCase();
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "Escape" && categoriaAtual) voltarParaCategorias();
+    });
 
-    const filtrado = motivos.filter(
-        item => item.includes(termo)
-    );
-
-    render(filtrado);
-});
-
-</script>
-
+    atualizarContadoresCategorias();
+  </script>
 </body>
 </html>
